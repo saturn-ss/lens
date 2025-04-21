@@ -30,16 +30,15 @@ export function getQRCodeImage(id) {
   return qrcode.toDataURL(url.href);
 }
 
-export function getDestinationUrl(qrCode){
-  if (qrCode.destination === 'product') {
+export function getDestinationUrl(qrCode) {
+  if (qrCode.destination === "product") {
     return `https://${qrCode.shop}/products/${qrCode.productHandle}`;
   }
 
   const match = /gid:\/\/shopify\/ProductVariant\/([0-9]+)/.exec(qrCode.productVariantId);
-
   invariant(match, "Unrecognized product variant ID");
 
-  return  `https://${qrCode.shop}/cart/${match[1]}:1`;
+  return `https://${qrCode.shop}/cart/${match[1]}:1`;
 }
 
 async function supplementQRCode(qrCode, graphql) {
@@ -74,11 +73,11 @@ async function supplementQRCode(qrCode, graphql) {
     ...qrCode,
     productDeleted: !product?.title,
     productTitle: product?.title,
-    productImage:product?.images?.nodes[0].url,
-    productAlt: product?.images?.nodes[0].altText,
+    productImage: product?.images?.nodes[0]?.url,
+    productAlt: product?.images?.nodes[0]?.altText,
     destinationUrl: getDestinationUrl(qrCode),
-    iamge: await qrCodeImagePromise,
-  }
+    image: await qrCodeImagePromise,
+  };
 }
 
 export function validateQRCode(data) {
