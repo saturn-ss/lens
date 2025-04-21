@@ -3,7 +3,7 @@
 client_id = "8f3208386385780dca87bbed9b95a030"
 name = "lens"
 handle = "lens-1"
-application_url = "https://diane-forward-pakistan-tide.trycloudflare.com"
+application_url = "https://velocity-fee-butler-get.trycloudflare.com"
 embedded = true
 
 [build]
@@ -27,9 +27,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://diane-forward-pakistan-tide.trycloudflare.com/auth/callback",
-  "https://diane-forward-pakistan-tide.trycloudflare.com/auth/shopify/callback",
-  "https://diane-forward-pakistan-tide.trycloudflare.com/api/auth/callback"
+  "https://velocity-fee-butler-get.trycloudflare.com/auth/callback",
+  "https://velocity-fee-butler-get.trycloudflare.com/auth/shopify/callback",
+  "https://velocity-fee-butler-get.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

@@ -12,7 +12,7 @@ import {
   Card,
   Bleed,
   Button,
-  ChoiseList,
+  ChoiceList,
   Divider,
   EmptyState,
   InlineStack,
@@ -25,7 +25,7 @@ import {
   BlockStack,
   PageActions,
 } from "@shopify/polaris";
-import { imageIcon } from "@shopify/polaris-icons";
+import { ImageIcon } from "@shopify/polaris-icons";
 
 import db from "../db.server";
 import { getQRCode, validateQRCode } from "../models/QRCode.server";
@@ -226,9 +226,49 @@ export default function QRCodeForm() {
             {qrCode ? (
               <EmptyState image={qrCode.image} imageContained={true} />
             ) : (
-              <EmptyState image=
+              <EmptyState image="">
+                Your QR code will appear here after you save
+              </EmptyState>
             )}
+            <BlockStack gap="300">
+              <Button
+                disabled={!qrCode?.image}
+                url={qrCode?.image}
+                download
+                variant="primary"
+              >
+                Download
+              </Button>
+              <Button
+                disabled={!qrCode?.id}
+                url={`/qrcodes/${qrCode.id}`}
+                target="_blank"
+              >
+                Go to public URL
+              </Button>
+            </BlockStack>
           </Card>
+        </Layout.Section>
+        <Layout.Section>
+          <PageActions
+            secondaryActions={[
+              {
+                content: "Delete",
+                loading: isDeleting,
+                disabled: !qrCode.id || !qrCode || isSaving || isDeleting,
+                destructive: true,
+                outline: true,
+                onAction: () => 
+                  submit({ action: "delete" }, { method: "post" }),
+              },
+            ]}
+            primaryAction={{
+              content: "Save",
+              loading: isSaving,
+              disabled: !isDirty || isSaving || isDeleting,
+              onAction: handleSave,
+            }}
+          />
         </Layout.Section>
       </Layout>
     </Page>
