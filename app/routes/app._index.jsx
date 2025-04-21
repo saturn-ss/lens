@@ -1,9 +1,6 @@
-import { useEffect } from "react";
-import {
-  useLoaderData,
-  Link,
-  useNavigate
-} from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+import { authenticate } from "../shopify.server";
 import {
   Card,
   EmptyState,
@@ -15,32 +12,37 @@ import {
   Icon,
   InlineStack,
 } from "@shopify/polaris";
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
-import { authenticate } from "../shopify.server";
-import { json } from "@remix-run/node";
 
-export const loader = async ({ request }) => {
+import { getQRCodes } from "../models/QRCode.server";
+import { AlertDiamondIcon, ImageIcon } from "@shopify/polaris-icons";
+
+export async function loader({ request }) {
   const { admin, session } = await authenticate.admin(request);
-  const qrCodes = await getQRCode(session.shop, admin.graphql);
+  const qrCodes = await getQRCodes(session.shop, admin.graphql);
 
   return json({
     qrCodes,
   });
-};
+}
 
 const EmptyQRCodeState = ({ onAction }) => (
   <EmptyState
     heading="Create unique QR codes for your product"
     action={{
       content: "Create QR code",
-      onAction
+      onAction,
     }}
-
     image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
   >
     <p>Allow customers to scan codes and buy products using their phones.</p>
   </EmptyState>
-)
+);
+
+function truncate(str, { length = 25 } = {}) {
+  if (!str) return "";
+  if (str.length <= length) return str;
+  return str.slice(0, length) + "…";
+}
 
 const QRTable = ({ qrCodes }) => (
   <IndexTable
@@ -58,7 +60,7 @@ const QRTable = ({ qrCodes }) => (
     ]}
     selectable={false}
   >
-    { qrCodes.map((qrCode) => (
+    {qrCodes.map((qrCode) => (
       <QRTableRow key={qrCode.id} qrCode={qrCode} />
     ))}
   </IndexTable>
@@ -97,78 +99,13 @@ const QRTableRow = ({ qrCode }) => (
   </IndexTable.Row>
 );
 
-export const action = async ({ request }) => {
-  const { admin } = await authenticate.admin(request);
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($product: ProductCreateInput!) {
-        productCreate(product: $product) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
-                }
-              }
-            }
-          }
-        }
-      }`,
-    {
-      variables: {
-        product: {
-          title: `${color} Snowboard`,
-        },
-      },
-    },
-  );
-  const responseJson = await response.json();
-  const product = responseJson.data.productCreate.product;
-  const variantId = product.variants.edges[0].node.id;
-  const variantResponse = await admin.graphql(
-    `#graphql
-    mutation shopifyRemixTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-      productVariantsBulkUpdate(productId: $productId, variants: $variants) {
-        productVariants {
-          id
-          price
-          barcode
-          createdAt
-        }
-      }
-    }`,
-    {
-      variables: {
-        productId: product.id,
-        variants: [{ id: variantId, price: "100.00" }],
-      },
-    },
-  );
-  const variantResponseJson = await variantResponse.json();
-
-  return {
-    product: responseJson.data.productCreate.product,
-    variant: variantResponseJson.data.productVariantsBulkUpdate.productVariants,
-  };
-};
-
 export default function Index() {
   const { qrCodes } = useLoaderData();
   const navigate = useNavigate();
 
   return (
     <Page>
-      <ui-title-bar title="QR code">
+      <ui-title-bar title="QR codes">
         <button variant="primary" onClick={() => navigate("/app/qrcodes/new")}>
           Create QR code
         </button>
