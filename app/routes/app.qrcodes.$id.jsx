@@ -69,7 +69,7 @@ export async function action({ request, params }) {
     : await db.qRCode.update({ where: { id: Number(params.id) }, data
   });
 
-  return redirect(`/app/qrcode/$${qrCode.id}`);
+  return redirect(`/app/qrcodes/${qrCode.id}`);
 }
 
 export default function QRCodeForm() {
@@ -77,7 +77,7 @@ export default function QRCodeForm() {
 
   const qrCode = useLoaderData();
   const [formState, setFormState] = useState(qrCode);
-  const [cleanFormState, setCleanFormSate] = useState(qrCode);
+  const [cleanFormState, setCleanFormState] = useState(qrCode);
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
 
   const nav = useNavigation();
