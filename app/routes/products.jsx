@@ -13,7 +13,7 @@ export async function loader({ request }) {
   const { admin } = await authenticate.admin(request);
 
   const response = await admin.graphql(
-    `#graphql
+    `
       query {
         products(first: 10) {
           edges {
@@ -33,21 +33,22 @@ export async function loader({ request }) {
   )
 
   const { data: product } = await response.json();
+
+  return product;
 }
 
 export default function products() {
-  const products = useLoaderData();
+  const { products: edges } = useLoaderData();
 
   return (
-    <Page title="Products">
+    <Page>
       <Layout>
         <Layout.Section>
-          <Card sectioned>
-            {products.map((product) => (
-              <Text key={product.id}>
-                {product.title} - {product.handle}
-              </Text>
-            ))}
+          <Card>
+            
+            { edges.map(product => 
+              <Text>{ product.id }</Text>
+            )}
           </Card>
         </Layout.Section>
       </Layout>
