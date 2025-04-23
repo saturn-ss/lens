@@ -43,6 +43,13 @@ export async function loader({ request }) {
                   }
                 }
               }
+              variants(first: 1) {
+                edges {
+                  node {
+                    price
+                  }
+                }
+              }
             }
             cursor
           }
@@ -75,7 +82,7 @@ export default function products() {
             headings={[
               { title: "Thumbnail", hidden: true },
               { title: "Title" },
-              { title: "Product"}
+              { title: "Price"}
             ]}
             selectable={false}
           >
@@ -92,7 +99,9 @@ export default function products() {
                   <IndexTable.Cell>
                     <Text>{product.node.title}</Text>
                   </IndexTable.Cell>
-                  <IndexTable.Cell></IndexTable.Cell>
+                  <IndexTable.Cell>
+                    <Text>{product.node.variants.edges[0].node.price}</Text>
+                  </IndexTable.Cell>
                 </IndexTable.Row>
               )
             })}
